@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 var server_port = 65432;
-var server_addr = "192.168.3.49";   // the IP address of your Raspberry PI
+var server_addr = "127.0.0.1";   // the IP address of your Raspberry PI
 
 // Send data to the Pi server
 function send_data(command) {
@@ -112,22 +112,22 @@ function updateKey(e) {
     if (e.keyCode == '87') {
         // up (w)
         document.getElementById("upArrow").style.color = "green";
-        send_data("87");
+        send_data("FORWARD");
     }
     else if (e.keyCode == '83') {
         // down (s)
         document.getElementById("downArrow").style.color = "green";
-        send_data("83");
+        send_data("BACKWARD");
     }
     else if (e.keyCode == '65') {
         // left (a)
         document.getElementById("leftArrow").style.color = "green";
-        send_data("65");
+        send_data("LEFT");
     }
     else if (e.keyCode == '68') {
         // right (d)
         document.getElementById("rightArrow").style.color = "green";
-        send_data("68");
+        send_data("RIGHT");
     }
 }
 
