@@ -31,15 +31,24 @@
   <div class="row">
     <div class="container">
         <div class="jumbotron text-center col-md-6">
+            <h4>Manual Control</h4>
             <span>&nbsp;&nbsp;</span> 
-            <span id="upArrow" style='font-size:50px; color:grey;'>&#8679;</span>
-            <br>
-            <span id="leftArrow" style='font-size:45px; color:grey;'>&#8678;</span>
+            <button id="upButton" class="btn btn-primary" style="font-size:20px; padding: 20px 30px;">
+                <span id="upArrow" style='font-size:50px; color:grey;'>&#8679;</span>
+            </button>
+            <br><br>
+            <button id="leftButton" class="btn btn-primary" style="font-size:20px; padding: 20px 30px;">
+                <span id="leftArrow" style='font-size:45px; color:grey;'>&#8678;</span>
+            </button>
             <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> 
-            <span id="rightArrow" style='font-size:45px; color:grey;'>&#8680;</span>
-            <br>
+            <button id="rightButton" class="btn btn-primary" style="font-size:20px; padding: 20px 30px;">
+                <span id="rightArrow" style='font-size:45px; color:grey;'>&#8680;</span>
+            </button>
+            <br><br>
             <span>&nbsp;&nbsp;</span> 
-            <span id="downArrow" style='font-size:50px; color:grey;'>&#8681;</span>
+            <button id="downButton" class="btn btn-primary" style="font-size:20px; padding: 20px 30px;">
+                <span id="downArrow" style='font-size:50px; color:grey;'>&#8681;</span>
+            </button>
         </div>
 
         <div class="jumbotron text-left col-md-6">
@@ -53,6 +62,8 @@
            <span id="distance_dot" style="color:green">&bull;</span> Distance Traveled: <span id="distance">0.0</span>
            <br>
            <span id="temprature_dot" style="color:green">&bull;</span> Temperature of the Pi: <span id="temperature">0.0</span>
+           <br>
+           <span id="battery_dot" style="color:green">&bull;</span> Battery Level: <span id="battery">0.0%</span>
            <br>
            Bluetooth return value: <span id="bluetooth"> </span>
           </p>  
