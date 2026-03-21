@@ -9,18 +9,7 @@ You can learn more about each of these components within the [Quick Start Guide]
 
 ## To Use
 
-To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
-
-```bash
-# Clone this repository
-git clone https://github.com/mccaesar/iot-labs.git
-# Go into the repository
-cd iot_lab2_UI
-# Install dependencies
-npm install
-# Run the app
-npm start
-```
+Clone the repository, the code I have been working on can be found in electron as that is where our main app sits. We will be building our scripts in there.
 
 Note: If you're using Linux Bash for Windows, [see this guide](https://www.howtogeek.com/261575/how-to-run-graphical-linux-desktop-applications-from-windows-10s-bash-shell/) or use `node` from the command prompt.
 
