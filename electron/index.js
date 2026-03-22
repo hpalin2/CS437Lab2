@@ -21,87 +21,52 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Use the IP address from your working curl command
 var server_port = 65432;
-var server_addr = "127.0.0.1";   // the IP address of your Raspberry PI
+var server_addr = "192.168.68.92"; 
+var base_url = `http://${server_addr}:${server_port}`;
 
-// Send data to the Pi server
-function send_data(command) {
-    const net = require('net');
-    
-    const client = net.createConnection({ port: server_port, host: server_addr }, () => {
-        console.log('connected to server!');
-        // send the command
-        client.write(`${command}\r\n`);
-    });
-    
-    // get the data from the server
-    client.on('data', (data) => {
-        const dataStr = data.toString().trim();
-        console.log('Received from server:', dataStr);
+async function send_data(command) {
+    try {
+        // This fetch call performs the exact same action as your curl -X POST
+        const response = await fetch(`${base_url}/command`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            // The body must be a JSON string: '{"command": "forward"}'
+            body: JSON.stringify({ "command": command.toLowerCase() })
+        });
+
+        const data = await response.json();
+        console.log('Server response:', data);
         
-        // Parse the received data
-        try {
-            // Try to parse as JSON first (for structured data like battery, temp, etc)
-            const jsonData = JSON.parse(dataStr);
-            if (jsonData.battery !== undefined) {
-                document.getElementById("battery").innerHTML = jsonData.battery.toFixed(1) + '%';
-            }
-            if (jsonData.temperature !== undefined) {
-                document.getElementById("temperature").innerHTML = jsonData.temperature.toFixed(1);
-            }
-            if (jsonData.distance !== undefined) {
-                document.getElementById("distance").innerHTML = jsonData.distance.toFixed(1);
-            }
-            if (jsonData.speed !== undefined) {
-                document.getElementById("speed").innerHTML = jsonData.speed.toFixed(1);
-            }
-            if (jsonData.direction !== undefined) {
-                document.getElementById("direction").innerHTML = jsonData.direction;
-            }
-        } catch (e) {
-            // If not JSON, just display as string
-            document.getElementById("bluetooth").innerHTML = dataStr;
+        if (data.status === "ok" && data.telemetry) {
+            updateUI(data.telemetry);
         }
-        
-        client.end();
-        client.destroy();
-    });
-
-    client.on('error', (err) => {
-        console.error('Connection error:', err);
-        client.destroy();
-    });
-
-    client.on('end', () => {
-        console.log('disconnected from server');
-    });
+    } catch (error) {
+        console.error('Network error:', error);
+        document.getElementById("bluetooth").innerHTML = "Connection Failed";
+    }
 }
 
-function client(){
-    
-    const net = require('net');
-    var input = document.getElementById("message").value;
+// Helper to update the HTML spans with new data
+function updateUI(telemetry) {
+    document.getElementById("direction").innerHTML = telemetry.direction;
+    document.getElementById("speed").innerHTML = telemetry.speed;
+    document.getElementById("temperature").innerHTML = telemetry.temperature;
+    document.getElementById("battery").innerHTML = telemetry.battery_percentage + "%";
+}
 
-    const client = net.createConnection({ port: server_port, host: server_addr }, () => {
-        // 'connect' listener.
-        console.log('connected to server!');
-        // send the message
-        client.write(`${input}\r\n`);
-    });
-    
-    // get the data from the server
-    client.on('data', (data) => {
-        document.getElementById("bluetooth").innerHTML = data;
-        console.log(data.toString());
-        client.end();
-        client.destroy();
-    });
-
-    client.on('end', () => {
-        console.log('disconnected from server');
-    });
-
-
+// Replace the old client() function to fetch telemetry
+async function client() {
+    try {
+        const response = await fetch(`${base_url}/telemetry`);
+        const data = await response.json();
+        updateUI(data);
+    } catch (e) {
+        console.error("Telemetry update failed", e);
+    }
 }
 
 // for detecting which key is been pressed w,a,s,d
