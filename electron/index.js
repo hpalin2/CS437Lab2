@@ -55,7 +55,8 @@ function updateUI(telemetry) {
     document.getElementById("direction").innerHTML = telemetry.direction;
     document.getElementById("speed").innerHTML = telemetry.speed;
     document.getElementById("temperature").innerHTML = telemetry.temperature;
-    document.getElementById("battery").innerHTML = telemetry.battery_percentage + "%";
+    document.getElementById("battery").innerHTML = telemetry.battery_percentage;
+    document.getElementById("battery_voltage").innerHTML = telemetry.battery_voltage;
 }
 
 // Replace the old client() function to fetch telemetry
@@ -116,10 +117,7 @@ function showButtonPressed(buttonId, arrowId) {
 }
 
 
-// update data for every 50ms
-function update_data(){
-    setInterval(function(){
-        // get image from python server
-        client();
-    }, 50);
-}
+// Auto-poll telemetry every 500ms on load
+document.addEventListener('DOMContentLoaded', function() {
+    setInterval(client, 500);
+});

@@ -1,4 +1,5 @@
 import threading
+import collections
 
 import config
 from hardware import get_hardware
@@ -10,17 +11,26 @@ _V_FULL = 8.4
 _V_EMPTY = 6.0
 
 
+_VOLTAGE_WINDOW = 10
+_voltage_samples: collections.deque = collections.deque(maxlen=_VOLTAGE_WINDOW)
+
+
 def _read_battery_voltage() -> float:
-    """Read real battery voltage from the robot_hat ADC.
+    """Read real battery voltage from the robot_hat ADC, smoothed over a
+    rolling window to reduce fluctuation from motor load and ADC noise.
 
     Returns 0.0 on non-Pi systems or if robot_hat is unavailable.
     """
     try:
         from robot_hat import utils
-        return utils.get_battery_voltage()
+        raw = utils.get_battery_voltage()
+        if raw > 0.0:
+            _voltage_samples.append(raw)
+        if _voltage_samples:
+            return round(sum(_voltage_samples) / len(_voltage_samples), 2)
+        return 0.0
     except Exception:
         return 0.0
-
 
 def _voltage_to_percentage(voltage: float) -> int:
     if voltage >= _V_FULL:
