@@ -184,13 +184,41 @@ curl -X POST http://localhost:65432/command \
 
 ## Bluetooth (extra credit)
 
-The Bluetooth service uses Python's built-in `socket.AF_BLUETOOTH` (Python 3.9+, Linux only) -- no pip packages needed.
+The Bluetooth service uses Python's built-in `socket.AF_BLUETOOTH` (Python 3.9+, Linux only) -- no pip packages needed. It runs as a background thread alongside Flask, sharing the same `CarController` and hardware. Commands from either interface drive the same motors.
 
-Enable it by setting `BT_ENABLED=true`:
+### 1. Pair the devices
+
+Before anything can connect, the Pi and client must be paired at the OS level. On the Pi:
 
 ```bash
+bluetoothctl
+# inside bluetoothctl:
+power on
+discoverable on
+pairable on
+# on the client device, scan and select the Pi
+# back in bluetoothctl, confirm the pairing when prompted:
+yes
+quit
+```
+
+### 2. Find the Pi's Bluetooth MAC
+
+```bash
+hciconfig | grep "BD Address"
+# example output: BD Address: DC:A6:32:80:7D:87
+```
+
+### 3. Start the server with Bluetooth enabled
+
+```bash
+source venv/bin/activate
 BT_ENABLED=true BT_MAC=DC:A6:32:80:7D:87 python server.py
 ```
+
+You should see `bluetooth service started on channel 1` in the output alongside the Flask startup.
+
+### 4. Connect a client
 
 The RFCOMM protocol is line-based: send a command string followed by `\n`, receive a JSON response followed by `\n`.
 
@@ -199,7 +227,38 @@ Client sends:  forward\n
 Server returns: {"status": "ok", "telemetry": {"direction": "forward", ...}}\n
 ```
 
-Both the Flask API and Bluetooth service share the same car state and hardware, so commands from either interface drive the same motors and return the same telemetry.
+Here is a minimal Python client (runs on a paired PC or another Pi):
+
+```python
+import socket
+import json
+
+PI_MAC = "DC:A6:32:80:7D:87"  # your Pi's Bluetooth MAC
+CHANNEL = 1
+
+sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+sock.connect((PI_MAC, CHANNEL))
+
+# send a command
+sock.sendall(b"forward\n")
+
+# read the JSON response (terminated by newline)
+buf = b""
+while b"\n" not in buf:
+    buf += sock.recv(1024)
+response = json.loads(buf.decode())
+print(response)
+
+sock.sendall(b"stop\n")
+buf = b""
+while b"\n" not in buf:
+    buf += sock.recv(1024)
+print(json.loads(buf.decode()))
+
+sock.close()
+```
+
+The same valid commands work over Bluetooth as over HTTP: `forward`, `backward`, `left`, `right`, `stop`. The watchdog auto-stop also applies -- if the client stops sending commands, the car halts after the timeout.
 
 ## Project structure
 
