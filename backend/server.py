@@ -46,10 +46,11 @@ def start(bluetooth=False):
         try:
             from bluetooth_service import BluetoothService
             bt = BluetoothService(car)
-            bt.start()
-            print(f"bluetooth service started on channel {config.BT_CHANNEL}")
-        except ImportError:
-            print("pybluez not installed -- skipping bluetooth service")
+            bound_addr = bt.start()
+            print(
+                "bluetooth service started on "
+                f"{bound_addr[0]} channel {bound_addr[1]}"
+            )
         except Exception as e:
             print(f"bluetooth service failed to start: {e}")
 

@@ -24,12 +24,13 @@ The server binds to `0.0.0.0:65432` by default. Override with environment variab
 | `TURN_POWER` | `30` | Motor power during turns (0-100) |
 | `CORS_ENABLED` | `true` | Allow cross-origin requests |
 | `BT_ENABLED` | `false` | Start Bluetooth RFCOMM listener on boot |
-| `BT_MAC` | `DC:A6:32:80:7D:87` | Pi Bluetooth adapter MAC |
+| `BT_MAC` | empty (`BDADDR_ANY`) | Local Bluetooth adapter MAC to bind, or leave empty / use `any` |
 | `BT_CHANNEL` | `1` | RFCOMM channel |
 
 Example with overrides:
 
 ```bash
+source venv/bin/activate
 PI_IP=192.168.0.209 DEFAULT_POWER=40 python server.py
 ```
 
@@ -196,6 +197,9 @@ bluetoothctl
 power on
 discoverable on
 pairable on
+# optional but usually helpful while testing
+agent on
+default-agent
 # on the client device, scan and select the Pi
 # back in bluetoothctl, confirm the pairing when prompted:
 yes
@@ -213,10 +217,17 @@ hciconfig | grep "BD Address"
 
 ```bash
 source venv/bin/activate
-BT_ENABLED=true BT_MAC=DC:A6:32:80:7D:87 python server.py
+BT_ENABLED=true python server.py
 ```
 
-You should see `bluetooth service started on channel 1` in the output alongside the Flask startup.
+If you want to bind a specific adapter instead of all local adapters:
+
+```bash
+source venv/bin/activate
+BT_ENABLED=true BT_MAC=88:A2:9E:57:1F:88 python server.py
+```
+
+You should see `bluetooth service started on ... channel 1` in the output alongside the Flask startup.
 
 ### 4. Connect a client
 

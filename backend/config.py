@@ -4,7 +4,7 @@ PI_IP = os.environ.get("PI_IP", "0.0.0.0")
 FLASK_PORT = int(os.environ.get("FLASK_PORT", "65432"))
 
 BT_ENABLED = os.environ.get("BT_ENABLED", "false").lower() == "true"
-BT_MAC = os.environ.get("BT_MAC", "DC:A6:32:80:7D:87")
+BT_MAC = os.environ.get("BT_MAC", "").strip()
 BT_CHANNEL = int(os.environ.get("BT_CHANNEL", "1"))
 
 CORS_ENABLED = os.environ.get("CORS_ENABLED", "true").lower() == "true"
